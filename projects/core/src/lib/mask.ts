@@ -1,6 +1,12 @@
 import {MaskHistory, MaskModel} from './classes';
 import {MASKITO_DEFAULT_OPTIONS} from './constants';
-import {ElementState, MaskitoOptions, SelectionRange, TypedInputEvent} from './types';
+import {
+    ElementState,
+    MaskitoElement,
+    MaskitoOptions,
+    SelectionRange,
+    TypedInputEvent,
+} from './types';
 import {
     areElementValuesEqual,
     EventListener,
@@ -30,7 +36,7 @@ export class Maskito extends MaskHistory {
     );
 
     constructor(
-        private readonly element: HTMLInputElement | HTMLTextAreaElement,
+        private readonly element: MaskitoElement,
         private readonly maskitoOptions: MaskitoOptions,
     ) {
         super();
@@ -94,6 +100,7 @@ export class Maskito extends MaskHistory {
                 case 'insertCompositionText':
                     return; // will be handled inside `compositionend` event
                 case 'insertLineBreak':
+                case 'insertParagraph':
                     return this.handleEnter(event);
                 case 'insertFromPaste':
                 case 'insertText':
@@ -284,7 +291,7 @@ export class Maskito extends MaskHistory {
     }
 
     private handleEnter(event: TypedInputEvent): void {
-        if (this.isTextArea) {
+        if (this.isTextArea || this.element.isContentEditable) {
             this.handleInsert(event, '\n');
         }
     }
